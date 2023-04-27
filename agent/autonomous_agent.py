@@ -1,19 +1,24 @@
 import openai
 import os
 import json
+import time
+from colorama import Fore, Style
 
 class AutonomousAgent:
     def __init__(self, model_id, name, prompt, memory_folder):
         openai.api_key = os.getenv("OPENAI_API_KEY")
+        self.response = None
+        self.stop_thinking = False
         self.model_id = model_id
         self.name = name
-        self.prompt = prompt
+        with open(f"prompt/{prompt}", "r") as f:
+            self.prompt = f.read()
         self.token = 0
         self.chat_history = []
         self.chat_file = f"{memory_folder}/{self.name}_memory.json"
         if os.path.isfile(self.chat_file) and os.path.getsize(self.chat_file) > 0:
             while True:
-                choice = input("Do you want to load the chat history from file? (Y/N)").lower()
+                choice = input(f"Do you want to load the chat history from file for {self.name} ? (Y/N)").lower()
                 if choice == "y":
                     with open(self.chat_file, "r") as f:
                         self.chat_history = json.load(f)
@@ -30,6 +35,7 @@ class AutonomousAgent:
             self.chat_history.append({"role": "system", "content": self.prompt})
 
     def send_message(self, user_message):
+        self.stop_thinking = False
         self.chat_history.append({"role": "user", "content": user_message})
         response = openai.ChatCompletion.create(
             model=self.model_id,
@@ -40,6 +46,9 @@ class AutonomousAgent:
         self.chat_history.append({"role": "assistant", "content": message})
         self.save_chat_history()
         self.token += response.usage.total_tokens
+        self.stop_thinking = True
+        self.show_pretty_message(message)
+        self.response = message
         return message
 
     def get_current_chat_history(self):
@@ -48,3 +57,14 @@ class AutonomousAgent:
     def save_chat_history(self):
         with open(self.chat_file, "w") as f:
             json.dump(self.chat_history, f)
+
+    def thinking_animation(self):
+        animation = "|/-\\"
+        i = 0
+        while self.stop_thinking != True:
+            print("Agent {} is thinking... {}".format(self.name, animation[i]), end="\r")
+            i = (i + 1) % len(animation)
+            time.sleep(0.1)
+
+    def show_pretty_message(self, response):
+        print(f"{Fore.CYAN}{self.name}:{Style.RESET_ALL}\n{response}")
