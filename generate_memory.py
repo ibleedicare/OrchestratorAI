@@ -6,6 +6,7 @@ parser = argparse.ArgumentParser(description="Create a JSON file with specified 
 parser.add_argument("agent_name", help="name of the agent")
 parser.add_argument("system_prompt_file", help="path to file containing system prompt content")
 parser.add_argument("user_prompt_file", help="path to file containing assistant prompt content")
+parser.add_argument("goal", help="goal to achieve")
 
 args = parser.parse_args()
 
@@ -15,8 +16,7 @@ with open(args.system_prompt_file, "r") as s, open(args.user_prompt_file, "r") a
     user_prompt_content = a.read()
 data = [
     {"role": "system", "content": system_prompt_content},
-    {"role": "user", "content": user_prompt_content},
-    {"role": "assistant", "content": "Response: I understand, I'll just keep the code in my memory"}
+    {"role": "assistant", "content": user_prompt_content},
 ]
 
 # parse the command line arguments

@@ -25,8 +25,7 @@ agents.pop(agents.index(orchestrator))
 current_token = 0
 shared_memory = []
 next_task = None
-for i in range(10):
-    print(f"Current task {i}")
+while True:
     best_agent = None
     agent = orchestrator
     if (agent.name == "OrchestratorAgent"):
@@ -55,9 +54,9 @@ for i in range(10):
     for agent in agents:
         if (agent.name == best_agent):
             print(f"{Fore.BLUE}The task will be : {Style.RESET_ALL}{task}")
-            #do_task = input(f"Give the task to {best_agent} ?")
-            #if (do_task == "n"):
-            #    break
+            do_task = input(f"Give the task to {best_agent} ?")
+            if (do_task == "n"):
+                break
             if (len(shared_memory) > 0):
                 agent.chat_history.append(shared_memory[-1])
             thinking_thread = threading.Thread(target=agent.thinking_animation)
