@@ -3,9 +3,12 @@ import os
 import json
 import time
 from colorama import Fore, Style
+import threading
 
-class AutonomousAgent:
+class AutonomousAgent(threading.Thread):
     def __init__(self, model_id, name, prompt, memory_folder):
+        super().__init__()
+        self.pool = None
         openai.api_key = os.getenv("OPENAI_API_KEY")
         self.response = None
         self.stop_thinking = False
@@ -68,3 +71,32 @@ class AutonomousAgent:
 
     def show_pretty_message(self, response):
         print(f"{Fore.CYAN}{self.name}:{Style.RESET_ALL}\n{response}")
+
+    def set_pool(self, pool):
+        self.pool = pool
+
+    def set_orchestrator_pool(self, pool):
+        self.orchestratorPool = pool
+
+    def process_task(self, task):
+        # init thread
+        thinking_thread = threading.Thread(target=self.thinking_animation, args=())
+        send_message_thread = threading.Thread(target=self.send_message, args=(task, ))
+
+        # start thread
+        send_message_thread.start()
+        thinking_thread.start()
+
+        # join thread
+        send_message_thread.join()
+        thinking_thread.join()
+
+
+    def run(self):
+        while True:
+            task = self.pool.get_task()
+            if not task:
+                break
+            if task:
+                print(f"Agent {self.name} is going to process the task: {task}")
+                self.send_message(task)
