@@ -1,1 +1,3 @@
 memory/
+generated/
+agent/__pycache__/*

@@ -1,12 +1,31 @@
+Goal: Run test_add.py to ensure all test pass
 Response: Here the current code 
 
-filename: main.py
+filename: test_add.py
 
 Code:
-class Player:
-    def __init__(self):
-        pass
 
-class Dungeon:
-    def __init(self):
-        pass
+import unittest
+from add import add
+
+class TestAddFunction(unittest.TestCase):
+
+    def test_adding_numbers(self):
+        result = add(2, 4)
+        self.assertEqual(result, 6)
+
+    def test_adding_negative_numbers(self):
+        result = add(-3, -5)
+        self.assertEqual(result, -8)
+
+    def test_adding_float_numbers(self):
+        result = add(2.3, 4.7)
+        self.assertAlmostEqual(result, 7.0, places=1)
+
+    def test_adding_zero(self):
+        result = add(0, 5)
+        self.assertEqual(result, 5)
+
+    def test_invalid_input(self):
+        with self.assertRaises(TypeError):
+            result = add('5', 6)

@@ -1,1 +1,0 @@
-// No code to show yet as this document mainly covers the architecture and design of the software solution.

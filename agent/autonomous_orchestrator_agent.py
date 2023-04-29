@@ -57,7 +57,7 @@ class AutonomousOrchestratorAgent(AutonomousAgent):
                 print(f"Agent {self.name} is going to process the task: {task}")
                 self.process_task(task)
                 self.best_pool = self.extract_pool(self.response)
-                self.task = self.extract_task(self.response)
+                self.task = task 
                 for pool in self.sub_pools:
                     if (pool.__class__.__name__ == self.best_pool):
                         pool_name = pool.__class__.__name__

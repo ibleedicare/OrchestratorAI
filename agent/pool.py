@@ -15,3 +15,9 @@ class DevPool(Pool):
 
 class TesterPool(Pool):
     pass
+
+class TestRunnerPool(Pool):
+    pass
+
+class QuitPool(Pool):
+    pass

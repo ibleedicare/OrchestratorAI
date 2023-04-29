@@ -1,5 +1,6 @@
 import yaml
 from agent import *
+from agent.shared_memory import SharedMemory
 from colorama import Fore, Style
 import threading
 
@@ -25,18 +26,27 @@ agents.pop(agents.index(orchestrator))
 current_token = 0
 shared_memory = []
 next_task = None
+# All pool
 devPool = DevPool([])
 testerPool = TesterPool([])
+testRunnerPool = TestRunnerPool([])
 orchestratorPool = Pool([])
 
+quitPool = QuitPool([])
+shared_memory = SharedMemory([])
+orchestrator_memory = SharedMemory([])
 best_agent = None
 # Set orchestrator pool
 orchestrator.set_pool(orchestratorPool)
-orchestrator.set_sub_pool([devPool, testerPool])
+orchestrator.set_sub_pool([devPool, testerPool, testRunnerPool])
+orchestrator.set_shared_memory(orchestrator_memory)
 # set new task
 if (next_task == None):
-    user_message = "Goal: " + input(f"{Fore.GREEN}User:{Style.RESET_ALL} ")
-    next_task = user_message
+    user_message = input(f"{Fore.GREEN}User:{Style.RESET_ALL} ")
+    if (user_message == "!user_prompt"):
+        with open("user_prompt.txt", "r") as f:
+            user_message = f.read()
+    next_task = f"Goal: {user_message}"
 
 # Process
 orchestratorPool.add_task(user_message)
@@ -52,7 +62,10 @@ for agent in agents:
         agent.set_pool(devPool)
     if (agent.__class__.__name__ == "AutonomousTesterDevAgent"):
         agent.set_pool(testerPool)
+    if (agent.__class__.__name__ == "AutonomousTestRunnerAgent"):
+        agent.set_pool(testerPool)
     agent.set_orchestrator_pool(orchestratorPool)
+    agent.set_shared_memory(shared_memory)
     agent.daemon = True
 
 for agent in agents:
@@ -63,6 +76,5 @@ for agent in agents:
 
 orchestrator.join()
 
-while True:
+while len(quitPool.tasks) == 0:
     time.sleep(1)
-    user = input("What do you want to do :")

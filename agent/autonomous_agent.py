@@ -9,6 +9,7 @@ class AutonomousAgent(threading.Thread):
     def __init__(self, model_id, name, prompt, memory_folder):
         super().__init__()
         self.pool = None
+        self.shared_memory = []
         openai.api_key = os.getenv("OPENAI_API_KEY")
         self.response = None
         self.stop_thinking = False
@@ -39,6 +40,9 @@ class AutonomousAgent(threading.Thread):
 
     def send_message(self, user_message):
         self.stop_thinking = False
+        if (len(self.shared_memory.memory) > 0):
+            print(f"{Fore.BLUE}{self.shared_memory.get_last_memory()}{Style.RESET_ALL}")
+            self.chat_history.append(self.shared_memory.get_last_memory())
         self.chat_history.append({"role": "user", "content": user_message})
         response = openai.ChatCompletion.create(
             model=self.model_id,
@@ -47,6 +51,10 @@ class AutonomousAgent(threading.Thread):
         message = response.choices[0].message.content.strip()
         self.chat_history = [d for d in self.chat_history if d.get('role') == 'system']
         self.chat_history.append({"role": "assistant", "content": message})
+        if (self.name != "OrchestratorAgent"):
+            self.shared_memory.memory.append({"role": "assistant", "content": message})
+        if (len(self.shared_memory.memory) > 0):
+            print(f"{Fore.BLUE}{self.shared_memory.get_last_memory()}{Style.RESET_ALL}")
         self.save_chat_history()
         self.token += response.usage.total_tokens
         self.stop_thinking = True
@@ -100,3 +108,6 @@ class AutonomousAgent(threading.Thread):
             if task:
                 print(f"Agent {self.name} is going to process the task: {task}")
                 self.send_message(task)
+
+    def set_shared_memory(self, shared_memory):
+        self.shared_memory = shared_memory
