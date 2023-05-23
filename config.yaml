@@ -4,16 +4,16 @@ agents:
     model_id: gpt-3.5-turbo
     chat_folder: memory
     prompt: orchestrator_prompt.txt
-      #- name: Aether
-      #  agent_type: AutonomousDevAgent
-      #  model_id: gpt-3.5-turbo
-      #  chat_folder: memory
-      #  prompt: aether_prompt.txt
-      #- name: Eden
-      #  agent_type: AutonomousDevAgent
-      #  model_id: gpt-3.5-turbo
-      #  chat_folder: memory
-      #  prompt: eden_prompt.txt
+  - name: Aether
+    agent_type: AutonomousDevAgent
+    model_id: gpt-3.5-turbo
+    chat_folder: memory
+    prompt: aether_prompt.txt
+  - name: Eden
+    agent_type: AutonomousDevAgent
+    model_id: gpt-3.5-turbo
+    chat_folder: memory
+    prompt: eden_prompt.txt
       #- name: Ethan
       #  agent_type: AutonomousTesterDevAgent
       #  model_id: gpt-3.5-turbo
